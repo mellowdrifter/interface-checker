@@ -1,6 +1,8 @@
-interface-checker
+#interface-checker
 =================
 Backend to check device for:
-1. Interface list
-2. Administrative status
-3. Operational status
+<ol>
+<li>Interface list</li>
+<li>Administrative status</li>
+<li>Operational status</li>
+</ol>
