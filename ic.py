@@ -22,14 +22,21 @@
 '''
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
+print"Imported SNMP"
+import sys
+print"Imported SYS"
 
-
+devices=[]
+if len(sys.argv) > 1: #If any routers passed via cli, we check those instead
+    devices = sys.argv[1]
+community="public"
 interface = []
+
 def interface_list(x):
     cmdGen = cmdgen.CommandGenerator()
     errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-            cmdgen.CommunityData('public'),
-            cmdgen.UdpTransportTarget(('172.16.64.50', 161)),
+            cmdgen.CommunityData(community),
+            cmdgen.UdpTransportTarget((x, 161)),
             '1.3.6.1.2.1.2.2.1.2',
     )
 
@@ -46,6 +53,8 @@ def interface_list(x):
             for varBindTableRow in varBindTable:
                 for name, val in varBindTableRow:
                     print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
-                    interface.append[val.prettyPrint()]
-    return interface
+                    #interface.append[val.prettyPrint()]
+    #return interface
 
+if __name__ == "__main__":
+    test=interface_list(devices)
