@@ -22,39 +22,52 @@
 '''
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-print"Imported SNMP"
 import sys
-print"Imported SYS"
 
-devices=[]
-if len(sys.argv) > 1: #If any routers passed via cli, we check those instead
-    devices = sys.argv[1]
+device=[]
+if len(sys.argv) < 2:
+    print"""
+This app requires an argument
+example: ic.py hostname
+"""
+    exit()
+else:
+    device = sys.argv[1]
 community="public"
 interface = []
 
 def interface_list(x):
-    cmdGen = cmdgen.CommandGenerator()
-    errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
-            cmdgen.CommunityData(community),
-            cmdgen.UdpTransportTarget((x, 161)),
-            '1.3.6.1.2.1.2.2.1.2',
-    )
+    int_name=[]
+    int_oid=[]
+    try:
+        cmdGen = cmdgen.CommandGenerator()
+        errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
+                cmdgen.CommunityData(community),
+                cmdgen.UdpTransportTarget((x, 161)),
+                '1.3.6.1.2.1.2.2.1.2',
+        )
 
-    if errorIndication:
-        print(errorIndication)
-    else:
-        if errorStatus:
-            print('%s at %s' % (
-                errorStatus.prettyPrint(),
-                errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
-                )
-            )
+        if errorIndication:
+            print(errorIndication)
         else:
-            for varBindTableRow in varBindTable:
-                for name, val in varBindTableRow:
-                    print('%s = %s' % (name.prettyPrint(), val.prettyPrint()))
-                    #interface.append[val.prettyPrint()]
-    #return interface
+            if errorStatus:
+                print('%s at %s' % (
+                    errorStatus.prettyPrint(),
+                    errorIndex and varBindTable[-1][int(errorIndex)-1] or '?'
+                    )
+                )
+            else:
+                for varBindTableRow in varBindTable: #varBindTableRow is each interface and oid number. Table is all together
+                    for name, val in varBindTableRow:
+                        int_name.append(name.prettyPrint())
+                        int_oid.append(val.prettyPrint())
+                        
+        return int_name, int_oid
+
+    except:
+        return None
 
 if __name__ == "__main__":
-    test=interface_list(devices)
+    name,oid=interface_list(device)
+    for i in range(len(name)):
+        print name[i],"=",oid[i]
