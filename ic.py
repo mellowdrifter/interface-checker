@@ -22,7 +22,6 @@
 '''
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from prettytable import PrettyTable
 import sys
 import re
 
@@ -36,7 +35,7 @@ example: ic.py hostname
     exit()
 else:
     device = sys.argv[1]
-community="public"
+community="strawberry"
 interface = []
 
 def interface_list(x):
@@ -69,10 +68,6 @@ def interface_admin(x,y):
         cmdgen.UdpTransportTarget((x, 161)),
         mib_value,
     )
-    if errorIndication:
-        print(errorIndication)
-    elif errorStatus:
-            print(errorStatus)
     for name, val in varBinds:
         admin.append(val.prettyPrint())
         if '1' in admin:
@@ -110,11 +105,37 @@ def interface_oper(x,y):
             int_oper = 'LOWER-LAYER-DOWN'
     return int_oper
 
+#def interface_time(x,y):
+    mib_value="1.3.6.1.2.1.2.2.1.9."+y
+    int_time=[]
+    cmdGen = cmdgen.CommandGenerator()
+    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+        cmdgen.CommunityData(community),
+        cmdgen.UdpTransportTarget((x, 161)),
+        mib_value,
+    )
+    for name, val in varBinds:
+        int_time.append(val.prettyPrint())
+    return int_time
+
 if __name__ == "__main__":
+    from prettytable import PrettyTable
+
+    print "Checking for interfaces ...",
     oid,name=interface_list(device)
-    x=PrettyTable(["OID Value","Interface Name","Admin Status","Operational Status"])
+    print "Done"
+    toolbar_width = len(name)
+    table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational Status"])
+    print "Checking "+str(len(name))+" interface values, please wait"
+    sys.stdout.write("[%s]" % (" " * toolbar_width))
+    sys.stdout.flush()
+    sys.stdout.write("\b" * (toolbar_width+1))
     for i in range(len(name)):
         int_admin = interface_admin(device,oid[i])
         int_oper = interface_oper(device,oid[i])
-        x.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],int_admin,int_oper])
-    print x
+        #int_time = interface_time(device,oid[i])
+        table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],int_admin,int_oper])
+        sys.stdout.write("-")
+        sys.stdout.flush()
+    print "\n\n"
+    print table
