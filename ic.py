@@ -35,7 +35,7 @@ example: ic.py hostname
     exit()
 else:
     device = sys.argv[1]
-community="strawberry"
+community="public"
 interface = []
 
 def interface_list(x):
