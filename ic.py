@@ -22,9 +22,10 @@
 '''
 
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-#from tabulate import tabulate
+from prettytable import PrettyTable
 import sys
 import re
+
 
 device=[]
 if len(sys.argv) < 2:
@@ -61,7 +62,7 @@ def interface_list(x):
 
 def interface_admin(x,y):
     mib_value="1.3.6.1.2.1.2.2.1.7."+y
-    int_admin=[]
+    admin=[]
     cmdGen = cmdgen.CommandGenerator()
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         cmdgen.CommunityData(community),
@@ -73,13 +74,18 @@ def interface_admin(x,y):
     elif errorStatus:
             print(errorStatus)
     for name, val in varBinds:
-        int_admin.append(val.prettyPrint())
-        int_admin=str(int_admin)
+        admin.append(val.prettyPrint())
+        if '1' in admin:
+            int_admin = 'UP'
+        elif '2' in admin:
+            int_admin = 'DOWN'
+        elif '3' in admin:
+            int_admin = 'TESTING'
     return int_admin
 
 def interface_oper(x,y):
     mib_value="1.3.6.1.2.1.2.2.1.8."+y
-    int_oper=[]
+    oper=[]
     cmdGen = cmdgen.CommandGenerator()
     errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
         cmdgen.CommunityData(community),
@@ -87,13 +93,28 @@ def interface_oper(x,y):
         mib_value,
     )
     for name, val in varBinds:
-        int_oper.append(val.prettyPrint())
-        int_oper=str(int_oper)
+        oper.append(val.prettyPrint())
+        if '1' in oper:
+            int_oper = 'UP'
+        elif '2' in oper:
+             int_oper = 'DOWN'
+        elif '3' in oper:
+             int_oper = 'TESTING'
+        elif '4' in oper:
+            int_oper = 'UNKNOWN'
+        elif '5' in oper:
+            int_oper = 'DORMANT'
+        elif '6' in oper:
+            int_oper = 'NOT-PRESENT'
+        elif '7' in oper:
+            int_oper = 'LOWER-LAYER-DOWN'
     return int_oper
 
 if __name__ == "__main__":
     oid,name=interface_list(device)
+    x=PrettyTable(["OID Value","Interface Name","Admin Status","Operational Status"])
     for i in range(len(name)):
         int_admin = interface_admin(device,oid[i])
         int_oper = interface_oper(device,oid[i])
-        print "1.3.6.1.2.1.2.2.1.2."+oid[i]+"\t\t"+name[i]+"\t\t"+int_admin+"\t\t"+int_oper
+        x.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],int_admin,int_oper])
+    print x
