@@ -8,7 +8,7 @@
 
 ###Requirements:
 <ol>
-<li>Python2</li>
+<li>python2</li>
 <li>pysnmp</li>
 <li>PrettyTable - If using direct from CLI</li>
 </ol>

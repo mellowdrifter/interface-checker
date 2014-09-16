@@ -35,7 +35,7 @@ example: ic.py hostname
     exit()
 else:
     device = sys.argv[1]
-community="strawberry"
+community="public"
 interface = []
 
 def interface_list(x):
@@ -125,9 +125,9 @@ if __name__ == "__main__":
     oid,name=interface_list(device)
     print "Done"
     toolbar_width = len(name)
-    table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational Status"])
+    table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational"])
     print "Checking "+str(len(name))+" interface values, please wait"
-    sys.stdout.write("[%s]" % (" " * toolbar_width))
+    sys.stdout.write("[%s]" % ("-" * toolbar_width))
     sys.stdout.flush()
     sys.stdout.write("\b" * (toolbar_width+1))
     for i in range(len(name)):
@@ -135,7 +135,7 @@ if __name__ == "__main__":
         int_oper = interface_oper(device,oid[i])
         #int_time = interface_time(device,oid[i])
         table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],int_admin,int_oper])
-        sys.stdout.write("-")
+        sys.stdout.write("*")
         sys.stdout.flush()
     print "\n\n"
     print table
