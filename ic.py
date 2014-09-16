@@ -29,7 +29,7 @@ import re
 device=[]
 if len(sys.argv) < 2:
     print"""
-This app requires an argument
+This app requires an argument!
 example: ic.py hostname
 """
     exit()
