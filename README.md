@@ -15,7 +15,7 @@
 
 
 ###Example usage:
-    Darren-MBP:interface-checker darren$ ./1.py pehdrt99
+    Darren-MBP:interface-checker darren$ ./1.py router-name
     +-------------------------+-----------------+--------------+--------------------+
     |        OID Value        |  Interface Name | Admin Status | Operational Status |
     +-------------------------+-----------------+--------------+--------------------+
