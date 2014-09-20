@@ -59,50 +59,56 @@ def interface_list(x):
     except:
         return None
 
-def interface_admin(x,y):
-    mib_value="1.3.6.1.2.1.2.2.1.7."+y
-    admin=[]
+def interface_admin(x):
+    int_admin=[]
+    admin=''
     cmdGen = cmdgen.CommandGenerator()
-    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+    errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
         cmdgen.CommunityData(community),
         cmdgen.UdpTransportTarget((x, 161)),
-        mib_value,
+        '1.3.6.1.2.1.2.2.1.7',
     )
-    for name, val in varBinds:
-        admin.append(val.prettyPrint())
-        if '1' in admin:
-            int_admin = 'UP'
-        elif '2' in admin:
-            int_admin = 'DOWN'
-        elif '3' in admin:
-            int_admin = 'TESTING'
+    for varBindTableRow in varBindTable:
+        for name, val in varBindTableRow:
+            admin_raw=val.prettyPrint()
+            if '1' in admin_raw:
+                admin = 'UP'
+            elif '2' in admin_raw:
+                admin = 'DOWN'
+            elif '3' in admin_raw:
+                admin = 'TESTING'
+            else:
+                print "Nothing Found"
+            int_admin.append(admin)
     return int_admin
 
-def interface_oper(x,y):
-    mib_value="1.3.6.1.2.1.2.2.1.8."+y
-    oper=[]
+def interface_oper(x):
+    int_oper=[]
+    oper=''
     cmdGen = cmdgen.CommandGenerator()
-    errorIndication, errorStatus, errorIndex, varBinds = cmdGen.getCmd(
+    errorIndication, errorStatus, errorIndex, varBindTable = cmdGen.nextCmd(
         cmdgen.CommunityData(community),
         cmdgen.UdpTransportTarget((x, 161)),
-        mib_value,
+        '1.3.6.1.2.1.2.2.1.8',
     )
-    for name, val in varBinds:
-        oper.append(val.prettyPrint())
-        if '1' in oper:
-            int_oper = 'UP'
-        elif '2' in oper:
-             int_oper = 'DOWN'
-        elif '3' in oper:
-             int_oper = 'TESTING'
-        elif '4' in oper:
-            int_oper = 'UNKNOWN'
-        elif '5' in oper:
-            int_oper = 'DORMANT'
-        elif '6' in oper:
-            int_oper = 'NOT-PRESENT'
-        elif '7' in oper:
-            int_oper = 'LOWER-LAYER-DOWN'
+    for varBindTableRow in varBindTable:
+        for name, val in varBindTableRow:
+            oper_raw=val.prettyPrint()
+            if '1' in oper_raw:
+                oper = 'UP'
+            elif '2' in oper_raw:
+                oper = 'DOWN'
+            elif '3' in oper_raw:
+                oper = 'TESTING'
+            elif '4' in oper_raw:
+                oper = 'UNKNOWN'
+            elif '5' in oper_raw:
+                oper = 'DORMANT'
+            elif '6' in oper_raw:
+                oper = 'NOT-PRESENT'
+            elif '7' in oper_raw:
+                oper = 'LOWER-LAYER-DOWN'
+            int_oper.append(oper)
     return int_oper
 
 #def interface_time(x,y):
@@ -123,6 +129,8 @@ if __name__ == "__main__":
 
     print "Checking for interfaces ...",
     oid,name=interface_list(device)
+    admin=interface_admin(device)
+    oper=interface_oper(device)
     print "Done"
     toolbar_width = len(name)
     table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational"])
@@ -131,10 +139,7 @@ if __name__ == "__main__":
     sys.stdout.flush()
     sys.stdout.write("\b" * (toolbar_width+1))
     for i in range(len(name)):
-        int_admin = interface_admin(device,oid[i])
-        int_oper = interface_oper(device,oid[i])
-        #int_time = interface_time(device,oid[i])
-        table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],int_admin,int_oper])
+        table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],admin[i],oper[i]])
         sys.stdout.write("*")
         sys.stdout.flush()
     print "\n\n"
