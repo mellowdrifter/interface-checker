@@ -77,8 +77,6 @@ def interface_admin(x):
                 admin = 'DOWN'
             elif '3' in admin_raw:
                 admin = 'TESTING'
-            else:
-                print "Nothing Found"
             int_admin.append(admin)
     return int_admin
 
@@ -129,18 +127,21 @@ if __name__ == "__main__":
 
     print "Checking for interfaces ...",
     oid,name=interface_list(device)
-    admin=interface_admin(device)
-    oper=interface_oper(device)
-    print "Done"
-    toolbar_width = len(name)
-    table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational"])
-    print "Checking "+str(len(name))+" interface values, please wait"
-    sys.stdout.write("[%s]" % ("-" * toolbar_width))
-    sys.stdout.flush()
-    sys.stdout.write("\b" * (toolbar_width+1))
-    for i in range(len(name)):
-        table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],admin[i],oper[i]])
-        sys.stdout.write("*")
+    if name:
+        admin=interface_admin(device)
+        oper=interface_oper(device)
+        print "Done"
+        toolbar_width = len(name)
+        table=PrettyTable(["OID Value","Interface Name","Admin Status","Operational"])
+        print "Checking "+str(len(name))+" interface values, please wait"
+        sys.stdout.write("[%s]" % ("-" * toolbar_width))
         sys.stdout.flush()
-    print "\n\n"
-    print table
+        sys.stdout.write("\b" * (toolbar_width+1))
+        for i in range(len(name)):
+            table.add_row(["1.3.6.1.2.1.2.2.1.2."+oid[i],name[i],admin[i],oper[i]])
+            sys.stdout.write("*")
+            sys.stdout.flush()
+        print "\n\n"
+        print table
+    else:
+        print "\n\nNo response from device!"
